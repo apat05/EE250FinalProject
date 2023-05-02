@@ -20,6 +20,27 @@ mqtt_client.connect("172.20.10.9", 1883, 60)
 # Initialize the previous distance measurement
 prev_distance = 160
 
+grovepi.pinMode(green_led_port, "OUTPUT")
+grovepi.pinMode(red_led_port, "OUTPUT")
+
+# Callback function for MQTT message received
+def on_message(client, userdata, message):
+    if message.topic == response_topic:
+        if message.payload.decode() == "yes":
+            # Turn on green LED if owner approves
+            grovepi.digitalWrite(green_led_port, 1)
+            grovepi.digitalWrite(red_led_port, 0)
+            print("Owner approved access!")
+        else:
+            # Turn on red LED if owner denies access
+            grovepi.digitalWrite(green_led_port, 0)
+            grovepi.digitalWrite(red_led_port, 1)
+            print("Owner denied access!")
+
+# Connect to MQTT broker and subscribe to response topic
+mqtt_client.on_message = on_message
+mqtt_client.subscribe(response_topic)
+mqtt_client.loop_start()
 # Loop to read ultrasonic sensor and send MQTT messages
 while True:
     try:
@@ -31,24 +52,12 @@ while True:
             # Send distance measurement to MQTT broker
             mqtt_client.publish(sensor_topic, distance)
 
-            # Wait for owner approval or denial
-            owner_approval = None
-            while owner_approval not in ["yes", "no"]:
-                owner_approval = input("Owner approval required. Approve access? (yes/no): ")
-
+            
+   
             # Update previous distance measurement
             prev_distance = 160
 
-            # Turn on green LED if owner approves
-            if owner_approval == "yes":
-                grovepi.digitalWrite(green_led_port, 1)
-                grovepi.digitalWrite(red_led_port, 0)
-                print("Owner approved access!")
-            # Turn on red LED if owner denies access
-            else:
-                grovepi.digitalWrite(green_led_port, 0)
-                grovepi.digitalWrite(red_led_port, 1)
-                print("Owner denied access!")
+            
 
         # Print distance measurement on terminal
         print("Distance: {} cm".format(distance))
@@ -60,5 +69,6 @@ while True:
         break
 
 # Disconnect from MQTT broker
+mqtt_client.loop_stop()
 mqtt_client.disconnect()
 
