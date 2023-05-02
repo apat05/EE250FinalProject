@@ -18,7 +18,7 @@ response_topic = "door/response"
 mqtt_client.connect("172.20.10.9", 1883, 60)
 
 # Initialize the previous distance measurement
-prev_distance = -1
+prev_distance = 10000
 
 # Turn on the LEDs appropriately
 # Callback function for MQTT message received
