@@ -66,16 +66,13 @@ mqtt_client.on_message = on_message
 mqtt_client.subscribe(response_topic)
 mqtt_client.loop_start()
 
-# Loop to send responses to laptop
+# Loop to wait for commands from laptop
 while True:
     try:
-        # Wait for response from laptop
-        response = input("Approve access? (yes/no): ")
-
-        # Send response to MQTT broker
-        mqtt_client.publish(response_topic, response)
-
-        # Wait for 1 second before sending another response
+        # Wait for command from laptop
+        mqtt_client.loop(0)
+        
+        # Wait for 1 second before checking again
         time.sleep(1)
 
     except KeyboardInterrupt:
@@ -84,5 +81,3 @@ while True:
 # Disconnect from MQTT broker and stop loop
 mqtt_client.loop_stop()
 mqtt_client.disconnect()
-
-
