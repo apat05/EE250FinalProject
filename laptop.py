@@ -7,32 +7,30 @@ mqtt_client = mqtt.Client()
 sensor_topic = "door/sensor"
 response_topic = "door/response"
 
-# Connect to MQTT broker
-mqtt_client.connect(host="172.20.10.9", port=1883, keepalive=60)
+# Callback function for MQTT message received
+def on_message(client, userdata, message):
+    if message.topic == sensor_topic:
+        # Print distance measurement received from Raspberry Pi
+        distance = int(message.payload)
+        print("Distance: {} cm".format(distance))
 
-# Loop to receive responses from laptop and send MQTT messages
-while True:
-    try:
-        # Wait for response from laptop
+        # Prompt user for response
         response = input("Approve access? (yes/no): ")
 
-        # Send response to MQTT broker
+        # Send response to Raspberry Pi
         mqtt_client.publish(response_topic, response)
 
-        # Wait for response from Raspberry Pi
-        mqtt_client.subscribe(sensor_topic)
-        message = mqtt_client.on_message
-        if message is not None:
-            # Convert payload to integer
-            distance = int(message.payload.decode())
+# Connect to MQTT broker
+mqtt_client.connect("172.20.10.9", 1883, 60)
 
-            # Check if distance is less than or equal to 50 cm
-            if distance <= 50:
-                # Request access from owner
-                print("Someone is at the door! Requesting access...")
+# Subscribe to sensor topic
+mqtt_client.subscribe(sensor_topic)
 
-    except KeyboardInterrupt:
-        break
+# Set up callback function for MQTT message received
+mqtt_client.on_message = on_message
+
+# Loop to receive responses from user
+mqtt_client.loop_forever()
 
 # Disconnect from MQTT broker
 mqtt_client.disconnect()
