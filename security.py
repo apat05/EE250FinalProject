@@ -15,7 +15,7 @@ sensor_topic = "door/sensor"
 response_topic = "door/response"
 
 # Connect to MQTT broker
-mqtt_client.connect("mqtt.eclipse.org", 1883, 60)
+mqtt_client.connect("mqtt.eclipse.org", 11000, 60)
 
 # Initialize the previous distance measurement
 prev_distance = -1
