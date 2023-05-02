@@ -15,10 +15,37 @@ sensor_topic = "door/sensor"
 response_topic = "door/response"
 
 # Connect to MQTT broker
-mqtt_client.connect(host="172.20.10.9", port=1883, keepalive=60)
+mqtt_client.connect("172.20.10.9", 1883, 60)
 
 # Initialize the previous distance measurement
 prev_distance = -1
+
+# Loop to read ultrasonic sensor and send MQTT messages
+while True:
+    try:
+        # Read distance from ultrasonic sensor
+        distance = grovepi.ultrasonicRead(ultrasonic_sensor_port)
+
+        # Check if distance has changed since previous measurement
+        if distance != prev_distance:
+            # Send distance measurement to MQTT broker
+            mqtt_client.publish(sensor_topic, distance)
+
+            # Print distance measurement on terminal
+            print("Distance: {} cm".format(distance))
+
+            # Update previous distance measurement
+            prev_distance = distance
+
+            # Wait for response from owner
+            mqtt_client.subscribe(response_topic)
+            mqtt_client.on_message = on_message
+
+        # Wait for 1 second before reading sensor again
+        time.sleep(1)
+
+    except KeyboardInterrupt:
+        break
 
 # Callback function for MQTT message received
 def on_message(client, userdata, message):
@@ -38,29 +65,18 @@ def on_message(client, userdata, message):
 grovepi.pinMode(green_led_port, "OUTPUT")
 grovepi.pinMode(red_led_port, "OUTPUT")
 
-# Loop to read ultrasonic sensor and send MQTT messages
+# Loop to receive responses from laptop and send MQTT messages
 while True:
     try:
-        # Read distance from ultrasonic sensor
-        distance = grovepi.ultrasonicRead(ultrasonic_sensor_port)
+        # Wait for response from laptop
+        response = input("Approve access? (yes/no): ")
 
-        # Check if distance has changed since previous measurement
-        if distance != prev_distance:
-            # Send distance measurement to MQTT broker
-            mqtt_client.publish(sensor_topic, distance)
-
-            # Update previous distance measurement
-            prev_distance = distance
-
-            # Wait for response from owner
-            mqtt_client.subscribe(response_topic)
-            mqtt_client.on_message = on_message
-
-        # Wait for 1 second before reading sensor again
-        time.sleep(1)
+        # Send response to MQTT broker
+        mqtt_client.publish(response_topic, response)
 
     except KeyboardInterrupt:
         break
 
 # Disconnect from MQTT broker
 mqtt_client.disconnect()
+
