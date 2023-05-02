@@ -8,7 +8,7 @@ sensor_topic = "door/sensor"
 response_topic = "door/response"
 
 # Connect to MQTT broker
-mqtt_client.connect("172.20.10.9", 11000, 60)
+mqtt_client.connect("172.20.10.6", 11000, 60)
 
 # Loop to receive responses from laptop and send MQTT messages
 while True:
