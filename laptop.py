@@ -1,16 +1,12 @@
 import paho.mqtt.client as mqtt
 import time
-# Set up MQTT client
-mqtt_client = mqtt.Client()
 
-# Define MQTT topics
+mqtt_client = mqtt.Client()
 sensor_topic = "door/sensor"
 response_topic = "door/response"
-
-# Connect to MQTT broker
 mqtt_client.connect("172.20.10.9", 1883, 60)
 
-# Callback function for MQTT message received
+# Callback function for MQTT message received and ask for owner access
 def on_message(client, userdata, message):
     if message.topic == sensor_topic:
         # Print distance measurement on terminal
@@ -30,7 +26,7 @@ mqtt_client.on_message = on_message
 mqtt_client.subscribe(sensor_topic)
 mqtt_client.loop_start()
 
-# Loop to send responses to Pi
+# Loop to send responses to RPi
 while True:
     try:
         # Wait for 1 second before sending another response
@@ -39,6 +35,5 @@ while True:
     except KeyboardInterrupt:
         break
 
-# Disconnect from MQTT broker and stop loop
 mqtt_client.loop_stop()
 mqtt_client.disconnect()
