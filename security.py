@@ -14,7 +14,7 @@ response_topic = "door/response"
 mqtt_client.connect("172.20.10.9", 1883, 60)
 
 # This is the initial distance of the Ultrasonic Sensor in cm
-prev_distance = grovepi.ultrasonicRead(ultrasonic_sensor_port)
+prev_distance = 80
 
 grovepi.pinMode(green_led_port, "OUTPUT")
 grovepi.pinMode(red_led_port, "OUTPUT")
