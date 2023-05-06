@@ -13,4 +13,8 @@ Instructions to compile -
   1. Connect to raspberry pi
   2. Clone Github repo and run security.py
   3. On your local computer, run laptop.py
-  4. 
+  4. The ultrasonic sensor will begin reading distances. Block it to sense a person moving in.
+  5. The laptop terminal will ask for access. Say 'yes' for allowing access and 'no' for denying access. The lights will turn on appropriately. 
+
+
+Thank you!
