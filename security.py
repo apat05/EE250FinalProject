@@ -60,6 +60,9 @@ while True:
     # ^C
     except KeyboardInterrupt:
         break
+
+grovepi.digitalWrite(green_led_port, 0)
+grovepi.digitalWrite(red_led_port, 0)
 mqtt_client.loop_stop()
 
 mqtt_client.disconnect()
