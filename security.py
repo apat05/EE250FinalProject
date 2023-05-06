@@ -13,8 +13,8 @@ sensor_topic = "door/sensor"
 response_topic = "door/response"
 mqtt_client.connect("172.20.10.9", 1883, 60)
 
-# This is the max distance of the Ultrasonic Sensor in cm
-prev_distance = 160
+# This is the initial distance of the Ultrasonic Sensor in cm
+prev_distance = grovepi.ultrasonicRead(ultrasonic_sensor_port)
 
 grovepi.pinMode(green_led_port, "OUTPUT")
 grovepi.pinMode(red_led_port, "OUTPUT")
@@ -51,9 +51,6 @@ while True:
             mqtt_client.publish(sensor_topic, distance)
 
             
-            # This is in case we want to save changes in distance to use later. 
-            # However, we do not so the following line is not needed.
-            prev_distance = 160
 
         # Print distance measurement on terminal
         print("Distance: {} cm".format(distance))
